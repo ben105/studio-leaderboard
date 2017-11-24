@@ -1,4 +1,5 @@
 from config import *
+import studio
 import sqlite3
 
 attendance_table = 'attendance'

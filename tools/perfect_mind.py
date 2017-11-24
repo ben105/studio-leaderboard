@@ -14,8 +14,6 @@ class Member:
 
 config = Config.load()
 
-member_guids = {}
-
 headers = [
   ('X-Access-Key', config.access_key),
   ('X-Client-Number', config.client_number),
@@ -70,6 +68,3 @@ def objects():
   resp = opener.open(URL + URI_objects)
   return json.load(resp)
 
-
-if __name__ == '__main__':
-  pass
