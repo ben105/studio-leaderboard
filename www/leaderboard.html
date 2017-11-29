@@ -1,0 +1,301 @@
+<html>
+
+<head>
+<title>Leaderboard</title>
+
+<style>
+
+html, body {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background-color: rgb(56, 60, 76);
+}
+
+div.top {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	padding: 40 0 40 0;
+}
+
+#header {
+	display: flex;
+	background-color: rgb(56, 60, 76);
+	height: 150px;
+}
+
+#header-title {
+	margin-left: 40px;
+	align-self: center;
+	color: rgb(237, 225, 204);
+	font-size: 40px;
+	font-family: "Arial";
+}
+
+#header-img {
+	width: 50px;
+	height: 50px;
+	align-self: center;
+	margin-left: 40px;
+}
+
+#first {
+	background-color: rgb(249, 104, 85);
+}
+
+#second {
+	background-color: rgb(224, 87, 78);
+}
+
+#third {
+	background-color: rgb(215, 82, 78);
+}
+
+#fourth {
+	background-color: rgb(205, 75, 76);
+}
+
+#fifth {
+	background-color: rgb(194, 68, 72);
+}
+
+span.top-name {
+	font-size: 40px;
+	font-family: "Arial";
+	color: white;
+	padding-left: 29px;
+	align-self: center;
+}
+
+span.top-attendance {
+	font-size: 40px;
+	font-family: "Arial";
+	color: white;
+	padding-right: 58px;
+	align-self: center;
+	text-align: right;
+	flex-grow: 5;
+}
+
+.circle, .little-circle { 
+	display: inline-flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+
+  background: white; 
+  -moz-border-radius: 50%; 
+  -webkit-border-radius: 50%; 
+  border-radius: 50%;
+
+	font-family: "Arial";
+	align-self: center;
+}
+
+.circle {
+	width: 60px;
+  height: 60px;
+  font-size: 40px;
+  margin-left: 29;
+}
+
+.little-circle {
+	width: 40px;
+	height: 40px;
+	font-size: 20px;
+	margin-left: 10;
+	color: gray;
+}
+
+.circle-number, .little-circle-number {
+	display: inline-block;
+	align-self: center;
+	flex-grow: 1;
+	text-align: center;
+}
+
+.circle-number {
+	width: 60px;
+}
+
+.little-circle-number {
+	width: 40px;
+}
+
+#first .circle-number {
+	color: rgb(249, 104, 85);
+}
+
+#second .circle-number {
+	color: rgb(224, 87, 78);
+}
+
+#third .circle-number {
+	color: rgb(215, 82, 78);
+}
+
+#fourth .circle-number {
+	color: rgb(205, 75, 76);
+}
+
+#fifth .circle-number {
+	color: rgb(194, 68, 72);
+}
+
+div.bottom-row {
+	display: flex;
+	flex-direction: row;
+	height: 120px;
+}
+
+span.column, span.column-last {
+	width: 33.333%;
+	margin: 10 0 10 10;
+	background-color: gray;
+	display: flex;
+}
+
+span.column-last {
+	margin-right: 10;
+}
+
+span.bottom-name {
+	font-size: 24px;
+	font-family: "Arial";
+	color: white;
+	padding-left: 16px;
+	align-self: center;
+}
+
+span.bottom-attendance {
+	font-size: 24px;
+	font-family: "Arial";
+	color: white;
+	padding-right: 16px;
+	align-self: center;
+	text-align: right;
+	flex-grow: 5;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div id="header">
+	<img id="header-img" src="cup.png"></img>
+	<span id="header-title">Studio Kicks Leaderboard</span>
+</div>
+
+<div class="top" id="first">
+	<div class="circle"><div class="circle-number">1</div></div>
+	<span class="top-name">Ben Rooke</span>
+	<span class="top-attendance">6</span>
+</div>
+
+<div class="top" id="second">
+	<div class="circle"><div class="circle-number">2</div></div>
+	<span class="top-name">Jackie Ausman</span>
+	<span class="top-attendance">4</span>
+</div>
+
+<div class="top" id="third">
+	<div class="circle"><div class="circle-number">3</div></div>
+	<span class="top-name">Ashley Sellars</span>
+	<span class="top-attendance">2</span>
+</div>
+
+<div class="top" id="fourth">
+	<div class="circle"><div class="circle-number">4</div></div>
+	<span class="top-name">Sabrina Gellar</span>
+	<span class="top-attendance">1</span>
+</div>
+
+<div class="top" id="fifth">
+	<div class="circle"><div class="circle-number">5</div></div>
+	<span class="top-name">Derek Forbes</span>
+	<span class="top-attendance">0</span>
+</div>
+
+
+
+<div class="bottom-row">
+	<span class="column">
+		<div class="little-circle"><div class="little-circle-number">6</div></div>
+		<span class="bottom-name">Ben Rooke</span>
+		<span class="bottom-attendance">12</span>
+	</span>
+	<span class="column">
+		<div class="little-circle"><div class="little-circle-number">7</div></div>
+		<span class="bottom-name">Shelby Hurley</span>
+		<span class="bottom-attendance">25</span>
+	</span>
+	<span class="column-last">
+		<div class="little-circle"><div class="little-circle-number">8</div></div>
+		<span class="bottom-name">Zoey Beaman</span>
+		<span class="bottom-attendance">519</span>
+	</span>
+</div>
+
+<div class="bottom-row">
+	<span class="column">
+		<div class="little-circle"><div class="little-circle-number">9</div></div>
+		<span class="bottom-name">Benjamin</span>
+		<span class="bottom-attendance">54</span>
+	</span>
+	<span class="column">
+		<div class="little-circle"><div class="little-circle-number">10</div></div>
+		<span class="bottom-name">Harry Sanabria</span>
+		<span class="bottom-attendance">3</span>
+	</span>
+	<span class="column-last">
+		<div class="little-circle"><div class="little-circle-number">11</div></div>
+		<span class="bottom-name">Simona</span>
+		<span class="bottom-attendance">99</span>
+	</span>
+</div>
+
+<div class="bottom-row">
+	<span class="column">
+		<div class="little-circle"><div class="little-circle-number">12</div></div>
+		<span class="bottom-name">Bezhou Feng</span>
+		<span class="bottom-attendance">26</span>
+	</span>
+	<span class="column">
+		<div class="little-circle"><div class="little-circle-number">13</div></div>
+		<span class="bottom-name">Dan Duong</span>
+		<span class="bottom-attendance">44</span>
+	</span>
+	<span class="column-last">
+		<div class="little-circle"><div class="little-circle-number">14</div></div>
+		<span class="bottom-name">Anjillie Walker</span>
+		<span class="bottom-attendance">66</span>
+	</span>
+</div>
+
+<div class="bottom-row">
+	<span class="column">
+		<div class="little-circle"><div class="little-circle-number">15</div></div>
+		<span class="bottom-name">Toni Sheppard</span>
+		<span class="bottom-attendance">543</span>
+	</span>
+	<span class="column">
+		<div class="little-circle"><div class="little-circle-number">16</div></div>
+		<span class="bottom-name">Derek Forbes</span>
+		<span class="bottom-attendance">12</span>
+	</span>
+	<span class="column-last">
+		<div class="little-circle"><div class="little-circle-number">17</div></div>
+		<span class="bottom-name">Nathan Burfield</span>
+		<span class="bottom-attendance">34</span>
+	</span>
+</div>
+
+</body>
+
+
+</html>
