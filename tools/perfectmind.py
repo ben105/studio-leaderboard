@@ -67,4 +67,3 @@ def objects():
   login()
   resp = opener.open(URL + URI_objects)
   return json.load(resp)
-

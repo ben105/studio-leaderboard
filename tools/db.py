@@ -1,5 +1,6 @@
 from config import *
-import studio
+from datetime import datetime
+import os
 import sqlite3
 
 attendance_table = 'attendance'
@@ -32,24 +33,203 @@ def table_exists(table):
 	query = table_query.format(table)
 	result = cur.execute(query)
 	rows = result.fetchall()
-	print(rows)
 	return len(rows) > 0
 
 def table_has_data(table):
 	query = count_query.format(table)
 	result = cur.execute(query)
 	row = result.fetchone()
-	print(row)
 	return int(row[0]) > 0
 
 
 def tables_exist():
 	for table in all_tables:
-		print("Iterating over table: " + table)
 		if table_exists(table) and table_has_data(table):
 			raise Exception('{} table still has data in it, clear data before continuing.'.format(table))
 
-def create_db():
+def attendance_after_epoch(time):
+	cur.execute("""
+		SELECT c.FullName, count(*) as ClassCount
+		FROM clients c, attendance a, teachers t, events e
+		WHERE a.Attendee = c.ID and a.Event = e.ID and e.Teacher = t.ID and a.TimeAttended > ?
+		GROUP BY c.ID
+		ORDER BY ClassCount desc;""", (time,))
+	return cur.fetchall()
+
+def insert_attendance_record(record):
+	cur.execute("""INSERT INTO attendance (
+		Attendee,
+		Event,
+		ModifiedDate,
+		Renewed,
+		Status,
+		TimeAttended,
+		Transactions
+	) VALUES (?, ?, ?, ?, ?, ?, ?);""",
+		(record.get('Attendee'),
+		record.get('Event'),
+		epoch(record.get('ModifiedDate')),
+		record.get('Renewed'),
+		record.get('Status'),
+		epoch(record.get('TimeAttended')),
+		record.get('Transactions'))
+	)
+	cur.connection.commit()
+
+def epoch(text):
+	if text is None or len(text) == 0:
+		return None
+	date_object = datetime.strptime(
+		text.split('.')[0],
+		'%Y-%m-%dT%H:%M:%S')
+	return int(date_object.strftime("%s"))
+
+def gender(text):
+	if text is None or len(text) == 0:
+		return 0
+	lower_case = text.lower()
+	if lower_case == 'male':
+		return 1
+	if lower_case == 'female':
+		return 2
+	return 0
+
+def membership_status(text):
+	if text is None or len(text) == 0:
+		return 0
+	lower_case = text.lower()
+	if lower_case == 'active':
+		return 1
+	if lower_case == 'cancelled':
+		return 2
+	if lower_case == 'expired':
+		return 3
+	if lower_case == 'freeze':
+		return 4
+	return 0
+
+def phone_number(text):
+	if text is None or len(text) == 0:
+		return 0
+	return int(text.replace('-', '').replace(' ', ''))
+
+def insert_contact_record(record):
+	cur.execute("""INSERT INTO clients (
+		ID,
+		FullName,
+		Gender,
+		Email,
+		Birthdate,
+		Membership,
+		PerfectScanID,
+		CreatedDate,
+		StartDate,
+		EnrollmentDate,
+		LastAttended,
+		Photo,
+		PrimaryNumber
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);""",
+		(record.get('ID'),
+		record.get('FullNameSimple'),
+		gender(record.get('Gender')),
+		record.get('Email'),
+		epoch(record.get('Birthdate')),
+		record.get('Membership'),
+		record.get('PerfectScanID'),
+		epoch(record.get('CreatedDate')),
+		epoch(record.get('StartDate')),
+		epoch(record.get('EnrollmentDate')),
+		epoch(record.get('LastAttended')),
+		record.get('Photo'),
+		record.get('PrimaryNumber'))
+	)
+	cur.connection.commit()
+
+def insert_transaction_record(record):
+	cur.execute("""INSERT INTO transactions (
+		CreatedDate,
+		DurationDays,
+		EachPayment,
+		Expiry,
+		FinalPayment,
+		FirstPayment,
+		ForfeitedAmount,
+		ID,
+		MembershipName,
+		MembershipStatus,
+		MembershipTotal,
+		ModifiedDate,
+		NumberofPayments,
+		Ongoing,
+		SessionsLeft,
+		SessionsPurchased,
+		TotalAmount
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);""",
+		(epoch(record.get('CreatedDate')),
+		record.get('DurationDays'),
+		record.get('EachPayment'),
+		epoch(record.get('Expiry')),
+		epoch(record.get('FinalPayment')),
+		epoch(record.get('FirstPayment')),
+		record.get('ForfeitedAmount'),
+		record.get('ID'),
+		record.get('MembershipName'),
+		membership_status(record.get('MembershipStatus')),
+		record.get('MembershipTotal'),
+		epoch(record.get('ModifiedDate')),
+		record.get('NumberofPayments'),
+		record.get('Ongoing'),
+		record.get('SessionsLeft'),
+		record.get('SessionsPurchased'),
+		record.get('TotalAmount'))
+	)
+	cur.connection.commit()
+
+def insert_teacher_record(record):
+	cur.execute("""INSERT INTO teachers (
+		CreatedDate,
+		Email,
+		FullName,
+		ID,
+		JobTitle,
+		MobilePhone,
+		ModifiedDate,
+		Position
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?);""",
+		(epoch(record.get('CreatedDate')),
+		record.get('Email'),
+		record.get('FullName'),
+		record.get('ID'),
+		record.get('JobTitle'),
+		phone_number(record.get('MobilePhone')),
+		epoch(record.get('ModifiedDate')),
+		record.get('Position'))
+	)
+	cur.connection.commit()
+
+def insert_event_record(record):
+	cur.execute("""INSERT INTO events (
+		CreatedDate,
+		Details,
+		EndTime,
+		ID,
+		Price,
+		StartTime,
+		Subject,
+		Teacher
+	) VALUES (?, ?, ?, ?, ?, ?, ?, ?);""",
+		(epoch(record.get('CreatedDate')),
+		record.get('Details'),
+		epoch(record.get('EndTime')),
+		record.get('Id'),
+		record.get('Price'),
+		epoch(record.get('StartTime')),
+		record.get('Subject'),
+		record.get('Teacher'))
+	)
+	cur.connection.commit()
+
+def create():
 	# Make sure the tables are not already populated.
 	tables_exist()
 
@@ -63,19 +243,19 @@ def create_db():
 	cur.execute("INSERT INTO genders VALUES (2, 'Female');")
 
 	cur.execute("""CREATE TABLE IF NOT EXISTS clients (
-		client_id TEXT,
-		full_name TEXT,
-		gender INTEGER,
-		email TEXT,
-		birthdate INTEGER,
-		membership TEXT,
-		perfect_scan_id TEXT,
-		created_date INTEGER,
-		start_date INTEGER,
-		enrollment_date INTEGER,
-		last_attended INTEGER,
-		photo TEXT,
-		primary_number INTEGER
+		ID TEXT,
+		FullName TEXT,
+		Gender INTEGER,
+		Email TEXT,
+		Birthdate INTEGER,
+		Membership TEXT,
+		PerfectScanID TEXT,
+		CreatedDate INTEGER,
+		StartDate INTEGER,
+		EnrollmentDate INTEGER,
+		LastAttended INTEGER,
+		Photo TEXT,
+		PrimaryNumber INTEGER
 	);""")
 
 	cur.execute("""CREATE TABLE IF NOT EXISTS membership_status (
@@ -143,5 +323,6 @@ def create_db():
 
 	cur.connection.commit()
 
+
 if __name__ == '__main__':
-	create_db()
+  create()
