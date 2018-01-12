@@ -45,16 +45,21 @@ def table_has_data(table):
 def tables_exist():
 	for table in all_tables:
 		if table_exists(table) and table_has_data(table):
-			raise Exception('{} table still has data in it, clear data before continuing.'.format(table))
+			return True
+	return False
 
-def attendance_after_epoch(time):
+def attendance_after_epoch(cur, time):
 	cur.execute("""
 		SELECT c.FullName, count(*) as ClassCount
 		FROM clients c, attendance a, teachers t, events e
 		WHERE a.Attendee = c.ID and a.Event = e.ID and e.Teacher = t.ID and a.TimeAttended > ?
 		GROUP BY c.ID
 		ORDER BY ClassCount desc;""", (time,))
-	return cur.fetchall()
+	rows = cur.fetchall()
+	json_resp = []
+	for row in rows:
+		json_resp.append( { 'name': row[0], 'attendance': row[1] } )
+	return json_resp
 
 def insert_attendance_record(record):
 	cur.execute("""INSERT INTO attendance (
@@ -231,7 +236,8 @@ def insert_event_record(record):
 
 def create():
 	# Make sure the tables are not already populated.
-	tables_exist()
+	if tables_exist():
+		return
 
 	# Create the tables.
 	cur.execute("""CREATE TABLE IF NOT EXISTS genders (
@@ -323,6 +329,6 @@ def create():
 
 	cur.connection.commit()
 
-
 if __name__ == '__main__':
   create()
+
