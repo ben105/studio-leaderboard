@@ -1,16 +1,12 @@
 import argparse
 from cookielib import CookieJar
+from datetime import datetime
 import json
 import os 
 import sys
 import urllib
 import urllib2
 from config import *
-
-class Member:
-  def __init__(self, full_name, scanID):
-    self.full_name = full_name
-    self.attendance = 0
 
 config = Config.load()
 
@@ -28,8 +24,22 @@ opener.addheaders = headers
 URL = 'https://studiokickslosgatos.perfectmind.com'
 URI_login = '/api/2.0/B2C/Login'
 URI_records = '/api/2.0/B2C/ObjectRecords'
-
 URI_objects = '/api/2.0/B2C/Objects'
+URI_query = '/api/2.0/B2C/Query'
+
+last_updated_path = os.path.join(config.workdir, 'last_updated.out')
+
+def last_updated():
+  if not os.path.isfile(last_updated_path):
+    return None
+  with open(last_updated_path) as datefile:
+    return datefile.read().strip()
+  return None
+
+def update():
+  with open(last_updated_path, 'w') as datefile:
+    now = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    datefile.write(now)
 
 def login():
   get_query = {
@@ -43,27 +53,46 @@ def login():
   opener.addheaders = headers
   opener.addheaders.append( ('X-Auth-Token', login_data["UserID"]) )
 
-def attendance():
-  return query_object('Attendance')
+def attendance(last_updated):
+  return query('Attendance', last_updated)
 
-def contacts():
-  return query_object('Contact')
+def contacts(last_updated):
+  return query('Contact', last_updated)
 
-def events():
-  return query_object('Event')
+def events(last_updated):
+  return query('Event', last_updated)
 
-def teachers():
-  return query_object('Teachers')
+def teachers(last_updated):
+  return query('Teachers', last_updated)
 
-def transactions():
-  return query_object('Transaction')
+def transactions(last_updated):
+  return query('Transaction', last_updated)
 
 def query_object(name):
-  login()
   resp = opener.open(URL + URI_records + '?tableName={}'.format(name))
   return json.load(resp)
 
 def objects():
-  login()
   resp = opener.open(URL + URI_objects)
   return json.load(resp)
+
+def query(table, last_updated):
+  query_string = 'SELECT * FROM Custom.{}'.format(table)
+  if last_updated:
+    query_string += ' WHERE Custom.{}.CreatedDate > convert(datetime, \'{}\')'.format(table, last_updated)
+  opener.addheaders.append( ('Content-Type', 'application/json') )
+  data = {
+    'QueryString': query_string
+  }
+  resp = opener.open(URL + URI_query, urllib.urlencode(data))
+  update()
+  return json.load(resp)
+
+def test_query(query_string):
+  opener.addheaders.append( ('Content-Type', 'application/json') )
+  data = {
+    'QueryString': query_string
+  }
+  resp = opener.open(URL + URI_query, urllib.urlencode(data))
+  return resp
+
