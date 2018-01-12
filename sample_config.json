@@ -1,0 +1,9 @@
+{
+	"AccessKey": "<Hex access key from Perfectmind>",
+	"ClientNumber": "",
+	"Username": "",
+	"Password": "",
+	"OrganizationID": "<Dash delimited hex ID from Perfectmind>",
+	"Database": "/opt/studio/studio.db",
+	"WorkDir": "/opt/studio"
+}

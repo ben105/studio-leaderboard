@@ -7,7 +7,7 @@ parser.add_argument(
   dest = 'config_path',
   nargs = '?',
   help = 'optional path to the configuration file',
-  default = '/opt/studio/config.json')
+  default = '/home/benrooke/studio_config.json') 
 
 args = parser.parse_args()
 
@@ -17,6 +17,7 @@ client_number_key = 'ClientNumber'
 password_key = 'Password'
 org_id_key = 'OrganizationID'
 database_key = 'Database'
+workdir_key = 'WorkDir'
 
 class Config(object):
 
@@ -27,6 +28,7 @@ class Config(object):
     self.password = data[password_key]
     self.orgID = data[org_id_key]
     self.database = data[database_key]
+    self.workdir = data[workdir_key]
 
   @staticmethod
   def load():
