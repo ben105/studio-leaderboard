@@ -3,6 +3,111 @@
 <head>
 <title>Leaderboard</title>
 
+<script>
+
+function useColloquialName(str) {
+  var firstQuoteIndex = str.indexOf('"');
+  if (firstQuoteIndex == -1) {
+    return str;
+  }
+  var secondQuoteIndex = str.indexOf('"', firstQuoteIndex + 1);
+  if (secondQuoteIndex == -1) {
+    return str;
+  }
+  var length = secondQuoteIndex - firstQuoteIndex;
+  var colloquialName = str.substr(firstQuoteIndex + 1, length - 1);
+  var lastName = str.substr(secondQuoteIndex + 1);
+  return colloquialName + lastName;
+}
+
+function toTitleCase(name) {
+  var colloquialName = useColloquialName(name);
+  return colloquialName.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
+
+function loadDoc() {
+  var myNode = document.getElementById("bottomRows");
+  while (myNode.lastChild) {
+    myNode.removeChild(myNode.lastChild);
+  }
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+     handleResponse(JSON.parse(this.responseText));
+    }
+  };
+  xhttp.open("GET", "http://benrooke.com:8089/studio/leaderboard", true);
+  xhttp.send();
+  setTimeout(function() {
+    loadDoc();
+  }, 90000);
+}
+
+function handleResponse(resp) {
+  var rank = 6;
+  var bottomRow = [];
+  for (var i = 0; i < resp.length; i++) {
+    if (i == 0) {
+	document.getElementById("first-name").innerHTML = toTitleCase(resp[i]["name"]);
+	document.getElementById("first-attendance").innerHTML = resp[i]["attendance"];
+    } else if (i == 1) {
+	document.getElementById("second-name").innerHTML = toTitleCase(resp[i]["name"]);
+	document.getElementById("second-attendance").innerHTML = resp[i]["attendance"];
+    } else if (i == 2) {
+	document.getElementById("third-name").innerHTML = toTitleCase(resp[i]["name"]);
+	document.getElementById("third-attendance").innerHTML = resp[i]["attendance"];
+    } else if (i == 3) {
+	document.getElementById("fourth-name").innerHTML = toTitleCase(resp[i]["name"]);
+	document.getElementById("fourth-attendance").innerHTML = resp[i]["attendance"];
+    } else if (i == 4) {
+	document.getElementById("fifth-name").innerHTML = toTitleCase(resp[i]["name"]);
+	document.getElementById("fifth-attendance").innerHTML = resp[i]["attendance"];
+    } else {
+        bottomRow.push(resp[i]);
+    }
+
+    if (bottomRow.length == 3) {
+        addBottomRow(bottomRow, rank);
+        rank += 3;
+        bottomRow = [];
+    }
+  }
+
+  if (bottomRow.length > 0) {
+      addBottomRow(bottomRow, rank);
+  }
+}
+
+function addBottomRow(bottomRow, startingRank) {
+  var newRow = document.createElement('div');
+  newRow.className = "bottom-row";
+  newRow.innerHTML = `
+          <span class="column">
+                  <div class="little-circle"><div class="little-circle-number">` + startingRank + `</div></div>
+                  <span class="bottom-name">` + toTitleCase(bottomRow[0]["name"]) + `</span>
+                  <span class="bottom-attendance">` + bottomRow[0]["attendance"] + `</span>
+          </span>`;
+  if (bottomRow.length > 1) {
+    newRow.innerHTML += `<span class="column">
+                  <div class="little-circle"><div class="little-circle-number">` + (startingRank + 1) + `</div></div>
+                  <span class="bottom-name">` + toTitleCase(bottomRow[1]["name"]) + `</span>
+                  <span class="bottom-attendance">` + bottomRow[0]["attendance"] + `</span>
+          </span>`;
+  }
+  if (bottomRow.length > 2) {
+    newRow.innerHTML += `<span class="column-last">
+                  <div class="little-circle"><div class="little-circle-number">` + (startingRank + 2) + `</div></div>
+                  <span class="bottom-name">` + toTitleCase(bottomRow[2]["name"]) + `</span>
+                  <span class="bottom-attendance">` + bottomRow[0]["attendance"] + `</span>
+          </span>`;
+  }
+
+  var bottomRows = document.getElementById("bottomRows");
+  bottomRows.appendChild(newRow);
+}
+
+</script>
+
 <style>
 
 html, body {
@@ -151,7 +256,7 @@ div.bottom-row {
 }
 
 span.column, span.column-last {
-	width: 33.333%;
+	width: 32.33%;
 	margin: 10 0 10 10;
 	background-color: gray;
 	display: flex;
@@ -184,7 +289,7 @@ span.bottom-attendance {
 </head>
 
 
-<body>
+<body onload="loadDoc()">
 
 <div id="header">
 	<img id="header-img" src="cup.png"></img>
@@ -193,106 +298,37 @@ span.bottom-attendance {
 
 <div class="top" id="first">
 	<div class="circle"><div class="circle-number">1</div></div>
-	<span class="top-name">Ben Rooke</span>
-	<span class="top-attendance">6</span>
+	<span id="first-name" class="top-name"></span>
+	<span id="first-attendance" class="top-attendance"></span>
 </div>
 
 <div class="top" id="second">
 	<div class="circle"><div class="circle-number">2</div></div>
-	<span class="top-name">Jackie Ausman</span>
-	<span class="top-attendance">4</span>
+	<span id="second-name" class="top-name"> </span>
+	<span id="second-attendance" class="top-attendance"></span>
 </div>
 
 <div class="top" id="third">
 	<div class="circle"><div class="circle-number">3</div></div>
-	<span class="top-name">Ashley Sellars</span>
-	<span class="top-attendance">2</span>
+	<span id="third-name" class="top-name"> </span>
+	<span id="third-attendance" class="top-attendance"></span>
 </div>
 
 <div class="top" id="fourth">
 	<div class="circle"><div class="circle-number">4</div></div>
-	<span class="top-name">Sabrina Gellar</span>
-	<span class="top-attendance">1</span>
+	<span id="fourth-name" class="top-name"> </span>
+	<span id="fourth-attendance" class="top-attendance"></span>
 </div>
 
 <div class="top" id="fifth">
 	<div class="circle"><div class="circle-number">5</div></div>
-	<span class="top-name">Derek Forbes</span>
-	<span class="top-attendance">0</span>
+	<span id="fifth-name" class="top-name"> </span>
+	<span id="fifth-attendance" class="top-attendance"></span>
 </div>
 
 
 
-<div class="bottom-row">
-	<span class="column">
-		<div class="little-circle"><div class="little-circle-number">6</div></div>
-		<span class="bottom-name">Ben Rooke</span>
-		<span class="bottom-attendance">12</span>
-	</span>
-	<span class="column">
-		<div class="little-circle"><div class="little-circle-number">7</div></div>
-		<span class="bottom-name">Shelby Hurley</span>
-		<span class="bottom-attendance">25</span>
-	</span>
-	<span class="column-last">
-		<div class="little-circle"><div class="little-circle-number">8</div></div>
-		<span class="bottom-name">Zoey Beaman</span>
-		<span class="bottom-attendance">519</span>
-	</span>
-</div>
-
-<div class="bottom-row">
-	<span class="column">
-		<div class="little-circle"><div class="little-circle-number">9</div></div>
-		<span class="bottom-name">Benjamin</span>
-		<span class="bottom-attendance">54</span>
-	</span>
-	<span class="column">
-		<div class="little-circle"><div class="little-circle-number">10</div></div>
-		<span class="bottom-name">Harry Sanabria</span>
-		<span class="bottom-attendance">3</span>
-	</span>
-	<span class="column-last">
-		<div class="little-circle"><div class="little-circle-number">11</div></div>
-		<span class="bottom-name">Simona</span>
-		<span class="bottom-attendance">99</span>
-	</span>
-</div>
-
-<div class="bottom-row">
-	<span class="column">
-		<div class="little-circle"><div class="little-circle-number">12</div></div>
-		<span class="bottom-name">Bezhou Feng</span>
-		<span class="bottom-attendance">26</span>
-	</span>
-	<span class="column">
-		<div class="little-circle"><div class="little-circle-number">13</div></div>
-		<span class="bottom-name">Dan Duong</span>
-		<span class="bottom-attendance">44</span>
-	</span>
-	<span class="column-last">
-		<div class="little-circle"><div class="little-circle-number">14</div></div>
-		<span class="bottom-name">Anjillie Walker</span>
-		<span class="bottom-attendance">66</span>
-	</span>
-</div>
-
-<div class="bottom-row">
-	<span class="column">
-		<div class="little-circle"><div class="little-circle-number">15</div></div>
-		<span class="bottom-name">Toni Sheppard</span>
-		<span class="bottom-attendance">543</span>
-	</span>
-	<span class="column">
-		<div class="little-circle"><div class="little-circle-number">16</div></div>
-		<span class="bottom-name">Derek Forbes</span>
-		<span class="bottom-attendance">12</span>
-	</span>
-	<span class="column-last">
-		<div class="little-circle"><div class="little-circle-number">17</div></div>
-		<span class="bottom-name">Nathan Burfield</span>
-		<span class="bottom-attendance">34</span>
-	</span>
+<div id="bottomRows">
 </div>
 
 </body>
