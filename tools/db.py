@@ -51,8 +51,8 @@ def tables_exist():
 def attendance_after_epoch(cur, time):
 	cur.execute("""
 		SELECT c.FullName, count(*) as ClassCount
-		FROM clients c, attendance a, teachers t, events e
-		WHERE a.Attendee = c.ID and a.Event = e.ID and e.Teacher = t.ID and a.TimeAttended > ?
+		FROM clients c, attendance a, events e
+		WHERE a.Attendee = c.ID and a.Event = e.ID and a.TimeAttended > ?
 		GROUP BY c.ID
 		ORDER BY ClassCount desc;""", (time,))
 	rows = cur.fetchall()
